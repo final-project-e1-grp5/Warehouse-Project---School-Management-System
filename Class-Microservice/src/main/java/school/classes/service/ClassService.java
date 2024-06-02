@@ -28,5 +28,11 @@ public interface ClassService {
 
     ResponseDto getTeachersInClass(String className);
 
+    ResponseDto getAllClassesForTeacher(String teacherId);
+
+    ResponseDto deleteAllClassesForTeacher(String teacherId);
+
+
+
 
 }

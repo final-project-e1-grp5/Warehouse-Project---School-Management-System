@@ -179,4 +179,31 @@ public class ClassServiceImpl implements ClassService {
 
         return new ResponseDto(404, "Class not found", "No class found with the provided name", System.currentTimeMillis(), "/getTeachersInClass", null);
     }
+
+    @Override
+    public ResponseDto getAllClassesForTeacher(String teacherId) {
+        List<ClassEntity> classes = classRepository.findByTeacherId(teacherId);
+        if (classes.isEmpty()) {
+            return new ResponseDto(404, "Not Found", "No classes found for the provided teacher ID", System.currentTimeMillis(), "/getAllClassesForTeacher", null);
+        }
+
+        List<Map<String, String>> payload = classes.stream()
+                .map(classEntity -> Map.of("className", classEntity.getClassName()))
+                .collect(Collectors.toList());
+
+        return new ResponseDto(200, null, "Classes retrieved for teacher", System.currentTimeMillis(), "/getAllClassesForTeacher", payload);
+    }
+
+    @Override
+    public ResponseDto deleteAllClassesForTeacher(String teacherId) {
+        List<ClassEntity> classes = classRepository.findByTeacherId(teacherId);
+        if (classes.isEmpty()) {
+            return new ResponseDto(404, "Not Found", "No classes found for the provided teacher ID", System.currentTimeMillis(), "/deleteAllClassesForTeacher", null);
+        }
+
+        classRepository.deleteAll(classes);
+
+        return new ResponseDto(200, null, "All classes deleted for teacher", System.currentTimeMillis(), "/deleteAllClassesForTeacher", null);
+    }
+
 }

@@ -14,7 +14,7 @@ public class ClassController {
     @Autowired
     private ClassService classService;
 
-    @PutMapping("/student")
+    @PutMapping("/update-student-class")
     public ResponseDto updateStudentClass(@RequestBody Map<String, String> requestBody) {
         String studentId = requestBody.get("studentId");
         String className = requestBody.get("className");
@@ -67,7 +67,8 @@ public class ClassController {
     }
 
     @DeleteMapping("/remove-student-from-class")
-    public ResponseDto removeStudentFromClass(@RequestBody String studentId) {
+    public ResponseDto removeStudentFromClass(@RequestBody Map<String, String> requestBody) {
+        String studentId = requestBody.get("studentId");
         ResponseDto response = classService.removeStudentFromClass(studentId);
         return response;
     }
@@ -82,5 +83,15 @@ public class ClassController {
     public ResponseDto getTeachersInClass(@PathVariable String className) {
         ResponseDto response = classService.getTeachersInClass(className);
         return response;
+    }
+
+    @GetMapping("/get-all-classes-for-teacher/{teacherId}")
+    public ResponseDto getAllClassesForTeacher(@PathVariable String teacherId) {
+        return classService.getAllClassesForTeacher(teacherId);
+    }
+
+    @DeleteMapping("/delete-all-classes-for-teacher/{teacherId}")
+    public ResponseDto deleteAllClassesForTeacher(@PathVariable String teacherId) {
+        return classService.deleteAllClassesForTeacher(teacherId);
     }
 }
