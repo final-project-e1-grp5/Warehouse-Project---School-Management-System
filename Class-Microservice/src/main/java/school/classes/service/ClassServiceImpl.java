@@ -18,11 +18,24 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public ResponseDto updateStudentClass(String studentId, String className) {
-        List<ClassEntity> classes = classRepository.findByStudentId(studentId);
-        for (ClassEntity classEntity : classes) {
-            classEntity.setClassName(className);
-            classRepository.save(classEntity);
+
+        Optional<ClassEntity> currentClassOpt = classRepository.findByStudentId(studentId);
+
+        // If no current class assignment is found, return a not found response
+        if (currentClassOpt.isEmpty()) {
+            return new ResponseDto(404, "Not Found", "Student not found", System.currentTimeMillis(), "/updateStudentClass", null);
         }
+        // Check if the student is already assigned to the target class
+        Optional<ClassEntity> targetClassOpt = classRepository.findByStudentIdAndClassName(studentId, className);
+        if (targetClassOpt.isPresent()) {
+            return new ResponseDto(409, "Conflict", "Student is already assigned to the target class", System.currentTimeMillis(), "/updateStudentClass", null);
+        }
+
+        // Update the student's current class assignment to the new class name
+        ClassEntity currentClass = currentClassOpt.get();
+        currentClass.setClassName(className);
+        classRepository.save(currentClass);
+
         return new ResponseDto(200, null, "Class name updated for student", System.currentTimeMillis(), "/updateStudentClass", null);
     }
 
@@ -50,7 +63,7 @@ public class ClassServiceImpl implements ClassService {
 
         // Update teacher's class name from current to new class
         currentClass.get().setClassName(newClassName);
-            classRepository.save(currentClass.get());
+        classRepository.save(currentClass.get());
 
 
         return new ResponseDto(200, null, "Teacher's class updated successfully", System.currentTimeMillis(), "/updateTeacherClass", null);
@@ -118,12 +131,10 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public ResponseDto removeStudentFromClass(String studentId) {
-        List<ClassEntity> existingClasses = classRepository.findByStudentId(studentId);
-        if (!existingClasses.isEmpty()) {
-            for (ClassEntity classEntity : existingClasses) {
-                classEntity.setStudentId(null);
-                classRepository.save(classEntity);
-            }
+        Optional<ClassEntity> existingClass = classRepository.findByStudentId(studentId);
+        if (existingClass.isPresent()) {
+            classRepository.delete(existingClass.get());
+
             return new ResponseDto(200, null, "Student removed from class", System.currentTimeMillis(), "/removeStudentFromClass", null);
         }
         return new ResponseDto(404, "Student not found", "No class found with the provided student ID", System.currentTimeMillis(), "/removeStudentFromClass", null);

@@ -8,11 +8,12 @@ import java.util.Optional;
 
 
 public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
-    List<ClassEntity> findByClassName(String className);
-    List<ClassEntity> findByStudentId(String studentId);
-    List<ClassEntity> findByTeacherId(String teacherId);
+    Optional<ClassEntity> findByStudentId(String studentId);
     Optional<ClassEntity> findByTeacherIdAndClassName(String teacherId, String className);
     Optional<ClassEntity> findByStudentIdAndClassName(String studentId, String className);
+    List<ClassEntity> findByTeacherId(String teacherId);
+    List<ClassEntity> findByClassName(String className);
+
 
 }
 
