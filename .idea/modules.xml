@@ -3,6 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Warehouse-Project---School-Management-System--FINAL.iml" filepath="$PROJECT_DIR$/.idea/Warehouse-Project---School-Management-System--FINAL.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grade/grade.iml" filepath="$PROJECT_DIR$/grade/grade.iml" />
+      <module fileurl="file://$PROJECT_DIR$/schedule/schedule.iml" filepath="$PROJECT_DIR$/schedule/schedule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/student/student.iml" filepath="$PROJECT_DIR$/student/student.iml" />
+      <module fileurl="file://$PROJECT_DIR$/teacher/teacher.iml" filepath="$PROJECT_DIR$/teacher/teacher.iml" />
     </modules>
   </component>
 </project>
