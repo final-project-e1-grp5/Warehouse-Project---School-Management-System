@@ -29,8 +29,12 @@
         <module name="grade" />
         <module name="admin" />
         <module name="class" />
+        <module name="user" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Warehouse-Project---School-Management-System--FINAL" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
