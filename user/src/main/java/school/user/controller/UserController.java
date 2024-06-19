@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import school.user.model.dto.AddUserDto;
 import school.user.model.dto.UpdateUserDto;
 import school.user.model.dto.UserDto;
+import school.user.model.dto.UserLoginDto;
 import school.user.model.entity.User;
 import school.user.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -19,6 +21,21 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestBody UserLoginDto loginRequest) {
+        try {
+            User user =
+                    userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+            if (user != null) {
+                return ResponseEntity.ok().body(Map.of("message", "Login successful", "user", user));
+            } else {
+                return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "Internal server error", "error", e.getMessage()));
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<UserDto> addUser(@Valid @RequestBody AddUserDto addUserDto) {
@@ -49,6 +66,7 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/get-by-role/{role}")
     public ResponseEntity<List<UserDto>> getAllUsersByRole(@PathVariable String role) {
         List<UserDto> users = userService.getUsersByRole(role);

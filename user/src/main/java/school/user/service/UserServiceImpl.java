@@ -75,8 +75,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByRole(String role) {
-        List<User> users = userRepo.findAllByrole(role);
+        List<User> users = userRepo.findAllByRole(role);
         return userMapper.toUserDtos(users);
+    }
+
+    @Override
+    public User authenticateUser(String email, String password) {
+        return userRepo.findByEmailAndPassword(email, password).orElse(null);
     }
 
     @Override

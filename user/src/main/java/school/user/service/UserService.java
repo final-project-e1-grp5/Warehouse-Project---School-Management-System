@@ -3,6 +3,8 @@ package school.user.service;
 import school.user.model.dto.AddUserDto;
 import school.user.model.dto.UpdateUserDto;
 import school.user.model.dto.UserDto;
+import school.user.model.entity.User;
+
 import java.util.List;
 
 public interface UserService {
@@ -18,4 +20,6 @@ public interface UserService {
     void deleteUser(String id);
 
     List<UserDto> getUsersByRole(String role);
+
+    User authenticateUser(String email, String password);
 }
