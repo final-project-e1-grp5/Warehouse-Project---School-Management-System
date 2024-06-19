@@ -29,6 +29,7 @@
         <module name="grade" />
         <module name="admin" />
         <module name="class" />
+        <module name="user" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

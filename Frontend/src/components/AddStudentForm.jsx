@@ -1,11 +1,11 @@
 // Version 1.0
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, InputGroup } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 
 const AddStudentForm = () => {
     const [studentData, setStudentData] = useState({
@@ -24,12 +24,12 @@ const AddStudentForm = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setStudentData({ ...studentData, [name]: value });
+        const {name, value} = e.target;
+        setStudentData({...studentData, [name]: value});
     };
 
     const handleDateChange = (date) => {
-        setStudentData({ ...studentData, birthday: date });
+        setStudentData({...studentData, birthday: date});
     };
 
     const generateUsername = () => {
@@ -57,7 +57,7 @@ const AddStudentForm = () => {
                 const username = generateUsername();
                 console.log('Generated Username:', username);
 
-                const response = await axios.post('/student/add', { ...studentData, username }, {
+                const response = await axios.post('/student', {...studentData, username}, {
                     headers: {
                         'Authorization': `Bearer ${token}`, // Add Authorization header
                         'X-XSRF-TOKEN': csrfToken, // Add CSRF token header
@@ -234,7 +234,7 @@ const AddStudentForm = () => {
                                             minLength="6"
                                         />
                                         <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
-                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}/>
                                         </Button>
                                         <Form.Control.Feedback type="invalid">
                                             Please provide a password with at least 6 characters.

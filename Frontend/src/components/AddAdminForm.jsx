@@ -1,11 +1,10 @@
-// Version 13.0
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, InputGroup } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 
 const AddAdminForm = () => {
     const [adminData, setAdminData] = useState({
@@ -13,10 +12,12 @@ const AddAdminForm = () => {
         lastName: '',
         email: '',
         password: '',
-        birthday: null,
-        phone: '',
+        dateOfBirth: null,
+        phoneNumber: '',
         address: '',
-        gender: ''
+        role: 'admin',
+        enabled: false,
+        username: ''
     });
 
     const [validated, setValidated] = useState(false);
@@ -24,17 +25,17 @@ const AddAdminForm = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setAdminData({ ...adminData, [name]: value });
+        const {name, value} = e.target;
+        setAdminData({...adminData, [name]: value});
     };
 
     const handleDateChange = (date) => {
-        setAdminData({ ...adminData, birthday: date });
+        setAdminData({...adminData, dateOfBirth: date});
     };
 
     const generateUsername = () => {
         const role = "AD"; // Hardcoded role for admin
-        const dob = adminData.birthday ? adminData.birthday.toISOString().split('T')[0].replace(/-/g, '') : '';
+        const dob = adminData.dateOfBirth ? adminData.dateOfBirth.toISOString().split('T')[0].replace(/-/g, '') : '';
         const initials = (adminData.firstName[0] || '') + (adminData.lastName[0] || '');
         return `${role}${dob}${initials}`.toUpperCase();
     };
@@ -47,7 +48,7 @@ const AddAdminForm = () => {
             setValidated(true);
         } else {
             try {
-                const token = localStorage.getItem('token'); // Ensure the token is retrieved correctly
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error("No token found");
                 }
@@ -57,17 +58,20 @@ const AddAdminForm = () => {
                 const username = generateUsername();
                 console.log('Generated Username:', username);
 
-                const response = await axios.post('/admin/add', { ...adminData, username }, {
+                const response = await axios.post('http://localhost:7777/admin', {
+                    ...adminData,
+                    username
+                }, {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Add Authorization header
-                        'X-XSRF-TOKEN': csrfToken, // Add CSRF token header
+                        'Authorization': `Bearer ${token}`,
+                        'X-XSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
                 console.log('Admin added successfully:', response.data);
 
                 setShowSuccess(true);
-                setTimeout(() => setShowSuccess(false), 3000); // Hide success message after 3 seconds
+                setTimeout(() => setShowSuccess(false), 3000);
 
                 // Reset form
                 setAdminData({
@@ -75,14 +79,19 @@ const AddAdminForm = () => {
                     lastName: '',
                     email: '',
                     password: '',
-                    birthday: null,
-                    phone: '',
+                    dateOfBirth: null,
+                    phoneNumber: '',
                     address: '',
-                    gender: ''
+                    role: 'admin',
+                    enabled: false,
+                    username: ''
                 });
                 setValidated(false);
             } catch (error) {
                 console.error('Error adding admin:', error);
+                if (error.response) {
+                    console.error('Error response data:', error.response.data);
+                }
             }
         }
     };
@@ -134,45 +143,23 @@ const AddAdminForm = () => {
                         </Row>
                         <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formBirthday">
-                                    <Form.Label>Birthday</Form.Label>
+                                <Form.Group className="mb-3" controlId="formDateOfBirth">
+                                    <Form.Label>Date of Birth</Form.Label>
                                     <div className="custom-datepicker">
                                         <DatePicker
-                                            selected={adminData.birthday}
+                                            selected={adminData.dateOfBirth}
                                             onChange={handleDateChange}
                                             dateFormat="yyyy-MM-dd"
                                             className="form-control"
-                                            name="birthday"
+                                            name="dateOfBirth"
                                             required
                                         />
                                     </div>
                                     <div className="invalid-feedback">
-                                        Please provide a valid birthday.
+                                        Please provide a valid date of birth.
                                     </div>
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formGender">
-                                    <Form.Label>Gender</Form.Label>
-                                    <Form.Control
-                                        as="select"
-                                        name="gender"
-                                        value={adminData.gender}
-                                        onChange={handleChange}
-                                        required
-                                    >
-                                        <option value="">Select Gender</option>
-                                        <option value="MALE">Male</option>
-                                        <option value="FEMALE">Female</option>
-                                        <option value="DIVERSE">Diverse</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        Please select a gender.
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAddress">
                                     <Form.Label>Address</Form.Label>
@@ -188,13 +175,15 @@ const AddAdminForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formPhone">
-                                    <Form.Label>Phone</Form.Label>
+                                <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Label>Phone Number</Form.Label>
                                     <Form.Control
                                         type="tel"
-                                        name="phone"
-                                        value={adminData.phone}
+                                        name="phoneNumber"
+                                        value={adminData.phoneNumber}
                                         onChange={handleChange}
                                         required
                                         pattern="^\d*$"
@@ -204,8 +193,6 @@ const AddAdminForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
@@ -221,6 +208,8 @@ const AddAdminForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formPassword">
                                     <Form.Label>Password</Form.Label>
@@ -234,7 +223,7 @@ const AddAdminForm = () => {
                                             minLength="6"
                                         />
                                         <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
-                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}/>
                                         </Button>
                                         <Form.Control.Feedback type="invalid">
                                             Please provide a password with at least 6 characters.

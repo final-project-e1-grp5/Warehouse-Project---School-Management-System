@@ -1,7 +1,6 @@
 package school.admin.service.admin;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.admin.model.dto.adminDto.*;
@@ -13,10 +12,9 @@ import school.admin.model.mapper.AdminMapper;
 import school.admin.proxy.UserProxy;
 import school.admin.repository.AdminRepo;
 import school.admin.service.user.AdminUserService;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -34,24 +32,25 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminUserDto addAdmin(AddAdminUserDto addAdminUserDto) {
 
-            // Convert AddAdminUserDto to AddUserDto and create the user
-            AddUserDto addUserDto = adminMapper.addAdminUserDtotoAddUserDto(addAdminUserDto);
-            UserDto createdUserDto = adminUserService.addUser(addUserDto);
+        // Convert AddAdminUserDto to AddUserDto and create the user
+        AddUserDto addUserDto = adminMapper.addAdminUserDtotoAddUserDto(addAdminUserDto);
+        UserDto createdUserDto = adminUserService.addUser(addUserDto);
 
-            // Convert AddAdminUserDto to Admin entity and set the user ID
-            Admin admin = adminMapper.addAdminUserDtotoAdmin(addAdminUserDto);
-            admin.setUserId(createdUserDto.getUserId());
+        // Convert AddAdminUserDto to Admin entity and set the user ID
+        Admin admin = adminMapper.addAdminUserDtotoAdmin(addAdminUserDto);
+        admin.setUserId(createdUserDto.getUserId());
 
-            // Save the admin entity
-            Admin createdAdmin = adminRepo.save(admin);
+        // Save the admin entity
+        Admin createdAdmin = adminRepo.save(admin);
 
-            // Convert Admin entity to AdminDto and combine with UserDto to create AdminUserDto
-            AdminDto adminDto = adminMapper.entityToAdminDto(createdAdmin);
-            AdminUserDto adminUserDto = adminMapper.toAdminUserDto(adminDto, createdUserDto);
+        // Convert Admin entity to AdminDto and combine with UserDto to create AdminUserDto
+        AdminDto adminDto = adminMapper.entityToAdminDto(createdAdmin);
+        AdminUserDto adminUserDto = adminMapper.toAdminUserDto(adminDto, createdUserDto);
 
-            return adminUserDto;
+        return adminUserDto;
 
     }
+
     @Override
     public AdminUserDto getAdmin(String id) {
         // Retrieve Admin entity from repository
@@ -63,13 +62,14 @@ public class AdminServiceImpl implements AdminService {
 
         // Retrieve UserDto from userProxy
         UserDto userDto = userProxy.getUser(id);
-        if( userDto !=null) {
+        if (userDto != null) {
 
-        // Combine AdminDto and UserDto to create AdminUserDto
-        return adminMapper.toAdminUserDto(adminDto, userDto);
-    }
+            // Combine AdminDto and UserDto to create AdminUserDto
+            return adminMapper.toAdminUserDto(adminDto, userDto);
+        }
         throw new RuntimeException("User not found");
-}
+    }
+
     @Override
     public List<AdminUserDto> getAllAdmins() {
 
@@ -83,7 +83,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<AdminDto> adminDtos = adminMapper.toAdminDtoList(admins);
 
-        List<AdminUserDto> adminUserDtos = adminMapper.toAdminUserDtoList(adminDtos,userDtos);
+        List<AdminUserDto> adminUserDtos = adminMapper.toAdminUserDtoList(adminDtos, userDtos);
 
 
         return adminUserDtos;
@@ -92,12 +92,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Transactional
     @Override
-    public AdminUserDto updateAdmin(String id,UpdateAdminUserDto updateAdminUserDto) {
+    public AdminUserDto updateAdmin(String id, UpdateAdminUserDto updateAdminUserDto) {
         // Step 1: Update User Profile
-        UserDto updatedUserDto = updateUserProfile(id,updateAdminUserDto);
+        UserDto updatedUserDto = updateUserProfile(id, updateAdminUserDto);
 
         // Step 2: Update Admin Profile
-        AdminUserDto adminUserDto = updateAdminProfile(id,updateAdminUserDto, updatedUserDto);
+        AdminUserDto adminUserDto = updateAdminProfile(id, updateAdminUserDto, updatedUserDto);
 
         return adminUserDto;
     }
@@ -121,7 +121,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (existingUserDto != null) {
             // Update the existing User profile
-            return userProxy.updateUser(id,updateUserDto);
+            return userProxy.updateUser(id, updateUserDto);
         } else {
             throw new RuntimeException("User profile not found");
         }
@@ -131,7 +131,7 @@ public class AdminServiceImpl implements AdminService {
      * Updates the Admin profile based on the provided UpdateAdminUserDto and updated UserDto.
      * Returns the updated AdminUserDto.
      */
-    private AdminUserDto updateAdminProfile(String id,UpdateAdminUserDto updateAdminUserDto, UserDto updatedUserDto) {
+    private AdminUserDto updateAdminProfile(String id, UpdateAdminUserDto updateAdminUserDto, UserDto updatedUserDto) {
         // Find the Admin profile by ID
         Optional<Admin> optionalAdmin = adminRepo.findById(id);
         if (optionalAdmin.isPresent()) {

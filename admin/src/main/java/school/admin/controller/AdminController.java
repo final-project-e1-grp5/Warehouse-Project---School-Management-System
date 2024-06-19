@@ -18,7 +18,7 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<AdminUserDto> addAdmin(@RequestBody AddAdminUserDto admin) {
         AdminUserDto adminUserDto = adminService.addAdmin(admin);
         return ResponseEntity.ok(adminUserDto);
@@ -35,9 +35,9 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdminUserDto> updateAdmin(@PathVariable String id,@RequestBody UpdateAdminUserDto updateAdminUserDto) {
+    public ResponseEntity<AdminUserDto> updateAdmin(@PathVariable String id, @RequestBody UpdateAdminUserDto updateAdminUserDto) {
         try {
-            AdminUserDto updatedAdmin = adminService.updateAdmin( id, updateAdminUserDto);
+            AdminUserDto updatedAdmin = adminService.updateAdmin(id, updateAdminUserDto);
             return ResponseEntity.ok(updatedAdmin);
             // Handles both User and Admin not found scenarios
         } catch (RuntimeException e) {
