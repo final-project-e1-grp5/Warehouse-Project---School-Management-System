@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import './LoginForm.css';
-import BackgroundVideo from '../assets/Background.mp4';  // Adjust the path to your video file
+import BackgroundVideo from '../assets/Background.mp4';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -11,15 +11,13 @@ const LoginForm = () => {
         e.preventDefault();
         console.log('Login form submitted');
         try {
-            const response = await axios.post('/user/login', { email, password });
+            const response = await axios.post('/user/user/login', {email, password});
             console.log('Response from backend:', response);
             if (response.data && response.data.user) {
                 console.log('User data received:', response.data.user);
-                // Store user data in localStorage
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 localStorage.setItem('token', response.data.token);
                 console.log('User data stored in localStorage');
-                // Redirect based on user role
                 const userRole = response.data.user.role.toLowerCase();
                 window.location.href = `/${userRole}/dashboard`;
             } else {
@@ -34,7 +32,7 @@ const LoginForm = () => {
         <div className="login-page">
             <div className="video-foreground">
                 <video autoPlay muted loop className="video-background">
-                    <source src={BackgroundVideo} type="video/mp4" />
+                    <source src={BackgroundVideo} type="video/mp4"/>
                     Your browser does not support the video tag.
                 </video>
             </div>
