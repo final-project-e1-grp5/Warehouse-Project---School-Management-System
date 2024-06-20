@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Container, Card, Row, Col } from 'react-bootstrap';
+import React, {useEffect} from 'react';
+import {Link} from 'react-router-dom';
+import {Button, Container, Card, Row, Col} from 'react-bootstrap';
 
 const AdminDashboard = () => {
     useEffect(() => {
@@ -31,8 +31,9 @@ const AdminDashboard = () => {
                             <Link to="/student/add">
                                 <Button variant="secondary" size="lg" className="w-100 mb-2">Add Student</Button>
                             </Link>
-                            <Link to="/student/edit/:id">
-                                <Button variant="outline-secondary" size="lg" className="w-100 mb-2">Edit Student</Button>
+                            <Link to="/admin/student/edit">
+                                <Button variant="outline-secondary" size="lg" className="w-100 mb-2">Edit
+                                    Student</Button>
                             </Link>
                         </Card.Body>
                     </Card>

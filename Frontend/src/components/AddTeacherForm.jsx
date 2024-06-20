@@ -1,11 +1,11 @@
-// Version 1.0
-import React, { useState } from 'react';
+// Version 1.7
+import React, {useState} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, InputGroup } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 
 const AddTeacherForm = () => {
     const [teacherData, setTeacherData] = useState({
@@ -13,10 +13,13 @@ const AddTeacherForm = () => {
         lastName: '',
         email: '',
         password: '',
-        birthday: null,
-        phone: '',
+        dateOfBirth: null,
+        phoneNumber: '',
         address: '',
-        gender: ''
+        role: 'teacher',
+        enabled: true,
+        username: '',
+        subject: ''
     });
 
     const [validated, setValidated] = useState(false);
@@ -24,17 +27,17 @@ const AddTeacherForm = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setTeacherData({ ...teacherData, [name]: value });
+        const {name, value} = e.target;
+        setTeacherData({...teacherData, [name]: value});
     };
 
     const handleDateChange = (date) => {
-        setTeacherData({ ...teacherData, birthday: date });
+        setTeacherData({...teacherData, dateOfBirth: date});
     };
 
     const generateUsername = () => {
         const role = "TE"; // Hardcoded role for teacher
-        const dob = teacherData.birthday ? teacherData.birthday.toISOString().split('T')[0].replace(/-/g, '') : '';
+        const dob = teacherData.dateOfBirth ? teacherData.dateOfBirth.toISOString().split('T')[0].replace(/-/g, '') : '';
         const initials = (teacherData.firstName[0] || '') + (teacherData.lastName[0] || '');
         return `${role}${dob}${initials}`.toUpperCase();
     };
@@ -47,27 +50,27 @@ const AddTeacherForm = () => {
             setValidated(true);
         } else {
             try {
-                const token = localStorage.getItem('token'); // Ensure the token is retrieved correctly
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error("No token found");
                 }
 
-                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1]; // Get CSRF token from cookie
-
                 const username = generateUsername();
                 console.log('Generated Username:', username);
 
-                const response = await axios.post('/teacher/add', { ...teacherData, username }, {
+                const response = await axios.post('/admin/teacher/add', {
+                    ...teacherData,
+                    username
+                }, {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Add Authorization header
-                        'X-XSRF-TOKEN': csrfToken, // Add CSRF token header
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
                 console.log('Teacher added successfully:', response.data);
 
                 setShowSuccess(true);
-                setTimeout(() => setShowSuccess(false), 3000); // Hide success message after 3 seconds
+                setTimeout(() => setShowSuccess(false), 3000);
 
                 // Reset form
                 setTeacherData({
@@ -75,14 +78,20 @@ const AddTeacherForm = () => {
                     lastName: '',
                     email: '',
                     password: '',
-                    birthday: null,
-                    phone: '',
+                    dateOfBirth: null,
+                    phoneNumber: '',
                     address: '',
-                    gender: ''
+                    role: 'teacher',
+                    enabled: true,
+                    username: '',
+                    subject: ''
                 });
                 setValidated(false);
             } catch (error) {
                 console.error('Error adding teacher:', error);
+                if (error.response) {
+                    console.error('Error response data:', error.response.data);
+                }
             }
         }
     };
@@ -134,45 +143,23 @@ const AddTeacherForm = () => {
                         </Row>
                         <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formBirthday">
-                                    <Form.Label>Birthday</Form.Label>
+                                <Form.Group className="mb-3" controlId="formDateOfBirth">
+                                    <Form.Label>Date of Birth</Form.Label>
                                     <div className="custom-datepicker">
                                         <DatePicker
-                                            selected={teacherData.birthday}
+                                            selected={teacherData.dateOfBirth}
                                             onChange={handleDateChange}
                                             dateFormat="yyyy-MM-dd"
                                             className="form-control"
-                                            name="birthday"
+                                            name="dateOfBirth"
                                             required
                                         />
                                     </div>
                                     <div className="invalid-feedback">
-                                        Please provide a valid birthday.
+                                        Please provide a valid date of birth.
                                     </div>
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formGender">
-                                    <Form.Label>Gender</Form.Label>
-                                    <Form.Control
-                                        as="select"
-                                        name="gender"
-                                        value={teacherData.gender}
-                                        onChange={handleChange}
-                                        required
-                                    >
-                                        <option value="">Select Gender</option>
-                                        <option value="MALE">Male</option>
-                                        <option value="FEMALE">Female</option>
-                                        <option value="DIVERSE">Diverse</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        Please select a gender.
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAddress">
                                     <Form.Label>Address</Form.Label>
@@ -188,13 +175,15 @@ const AddTeacherForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formPhone">
-                                    <Form.Label>Phone</Form.Label>
+                                <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Label>Phone Number</Form.Label>
                                     <Form.Control
                                         type="tel"
-                                        name="phone"
-                                        value={teacherData.phone}
+                                        name="phoneNumber"
+                                        value={teacherData.phoneNumber}
                                         onChange={handleChange}
                                         required
                                         pattern="^\d*$"
@@ -204,8 +193,6 @@ const AddTeacherForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
@@ -218,6 +205,35 @@ const AddTeacherForm = () => {
                                     />
                                     <Form.Control.Feedback type="invalid">
                                         Please provide a valid email address.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3" controlId="formSubject">
+                                    <Form.Label>Subject</Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        name="subject"
+                                        value={teacherData.subject}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="">Select Subject</option>
+                                        <option value="Math">Math</option>
+                                        <option value="Science">Science</option>
+                                        <option value="English">English</option>
+                                        <option value="History">History</option>
+                                        <option value="Geography">Geography</option>
+                                        <option value="Physics">Physics</option>
+                                        <option value="Chemistry">Chemistry</option>
+                                        <option value="Biology">Biology</option>
+                                        <option value="Physical Education">Physical Education</option>
+                                        <option value="Art">Art</option>
+                                    </Form.Control>
+                                    <Form.Control.Feedback type="invalid">
+                                        Please select a subject.
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
@@ -234,7 +250,7 @@ const AddTeacherForm = () => {
                                             minLength="6"
                                         />
                                         <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
-                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}/>
                                         </Button>
                                         <Form.Control.Feedback type="invalid">
                                             Please provide a password with at least 6 characters.

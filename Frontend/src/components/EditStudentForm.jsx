@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, InputGroup, ListGroup, Modal } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, InputGroup, ListGroup, Modal} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -14,11 +14,11 @@ const EditStudentForm = () => {
         email: '',
         username: '',
         password: '********', // Placeholder for password
-        birthday: null,
-        phone: '',
+        dateOfBirth: null,
+        phoneNumber: '',
         address: '',
-        gender: '',
-        role: 'STUDENT'
+        role: 'student',
+        enabled: true
     });
     const [validated, setValidated] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -33,7 +33,7 @@ const EditStudentForm = () => {
 
     const fetchStudentData = async (id) => {
         try {
-            const response = await axios.get(`/student/${id}`);
+            const response = await axios.get(`/admin/student/${id}`);
             const student = response.data;
             setStudentData({
                 firstName: student.firstName,
@@ -41,11 +41,11 @@ const EditStudentForm = () => {
                 email: student.email,
                 username: student.username,
                 password: '********',
-                birthday: new Date(student.birthday),
-                phone: student.phone,
+                dateOfBirth: new Date(student.dateOfBirth),
+                phoneNumber: student.phoneNumber,
                 address: student.address,
-                gender: student.gender,
-                role: student.role
+                role: student.role,
+                enabled: student.enabled
             });
         } catch (error) {
             console.error('Error fetching student data:', error);
@@ -58,7 +58,7 @@ const EditStudentForm = () => {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get(`/student?search=${searchQuery}`);
+            const response = await axios.get(`/admin/student/search?query=${searchQuery}`);
             setSearchResults(response.data);
         } catch (error) {
             console.error('Error searching for student:', error);
@@ -67,7 +67,7 @@ const EditStudentForm = () => {
 
     const handleViewAll = async () => {
         try {
-            const response = await axios.get(`/student`);
+            const response = await axios.get(`/admin/student/all`);
             setSearchResults(response.data);
         } catch (error) {
             console.error('Error fetching all students:', error);
@@ -82,22 +82,22 @@ const EditStudentForm = () => {
             email: student.email,
             username: student.username,
             password: '********',
-            birthday: new Date(student.birthday),
-            phone: student.phone,
+            dateOfBirth: new Date(student.dateOfBirth),
+            phoneNumber: student.phoneNumber,
             address: student.address,
-            gender: student.gender,
-            role: student.role
+            role: student.role,
+            enabled: student.enabled
         });
         setSearchResults([]);
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setStudentData({ ...studentData, [name]: value });
+        const {name, value} = e.target;
+        setStudentData({...studentData, [name]: value});
     };
 
     const handleDateChange = (date) => {
-        setStudentData({ ...studentData, birthday: date });
+        setStudentData({...studentData, dateOfBirth: date});
     };
 
     const handleSubmit = async (e) => {
@@ -113,19 +113,17 @@ const EditStudentForm = () => {
                     throw new Error("No token found");
                 }
 
-                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1];
 
-                const updatedStudentData = { ...studentData };
+                const updatedStudentData = {...studentData};
                 if (updatedStudentData.password === '********') {
                     delete updatedStudentData.password;
                 }
 
                 console.log('Updating student with data:', updatedStudentData);
 
-                const response = await axios.put(`/student/${selectedStudentId}`, updatedStudentData, {
+                const response = await axios.put(`/admin/student/${selectedStudentId}`, updatedStudentData, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'X-XSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -154,12 +152,9 @@ const EditStudentForm = () => {
                 throw new Error("No token found");
             }
 
-            const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1];
-
-            const response = await axios.delete(`/student/${selectedStudentId}`, {
+            const response = await axios.delete(`/admin/student/${selectedStudentId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'X-XSRF-TOKEN': csrfToken,
                     'Content-Type': 'application/json'
                 }
             });
@@ -172,11 +167,11 @@ const EditStudentForm = () => {
                 email: '',
                 username: '',
                 password: '',
-                birthday: null,
-                phone: '',
+                dateOfBirth: null,
+                phoneNumber: '',
                 address: '',
-                gender: '',
-                role: 'STUDENT'
+                role: 'student',
+                enabled: true
             });
 
             setShowDeleteSuccess(true);
@@ -267,10 +262,10 @@ const EditStudentForm = () => {
                             </Row>
                             <Row>
                                 <Col md={6}>
-                                    <Form.Group className="mb-3" controlId="formBirthday">
-                                        <Form.Label>Birthday</Form.Label>
+                                    <Form.Group className="mb-3" controlId="formDateOfBirth">
+                                        <Form.Label>Date of Birth</Form.Label>
                                         <DatePicker
-                                            selected={studentData.birthday}
+                                            selected={studentData.dateOfBirth}
                                             onChange={handleDateChange}
                                             dateFormat="yyyy-MM-dd"
                                             className="form-control"
@@ -281,32 +276,10 @@ const EditStudentForm = () => {
                                             required
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            Please provide a valid birthday.
+                                            Please provide a valid date of birth.
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3" controlId="formGender">
-                                        <Form.Label>Gender</Form.Label>
-                                        <Form.Control
-                                            as="select"
-                                            name="gender"
-                                            value={studentData.gender}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="">Select Gender</option>
-                                            <option value="MALE">Male</option>
-                                            <option value="FEMALE">Female</option>
-                                            <option value="DIVERSE">Diverse</option>
-                                        </Form.Control>
-                                        <Form.Control.Feedback type="invalid">
-                                            Please select a gender.
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formAddress">
                                         <Form.Label>Address</Form.Label>
@@ -323,13 +296,15 @@ const EditStudentForm = () => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
+                            </Row>
+                            <Row>
                                 <Col md={6}>
-                                    <Form.Group className="mb-3" controlId="formPhone">
-                                        <Form.Label>Phone</Form.Label>
+                                    <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                        <Form.Label>Phone Number</Form.Label>
                                         <Form.Control
                                             type="tel"
-                                            name="phone"
-                                            value={studentData.phone}
+                                            name="phoneNumber"
+                                            value={studentData.phoneNumber}
                                             onChange={handleChange}
                                             required
                                             pattern="^\d*$"
@@ -339,8 +314,6 @@ const EditStudentForm = () => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
-                            </Row>
-                            <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3" controlId="formEmail">
                                         <Form.Label>Email</Form.Label>
@@ -353,23 +326,7 @@ const EditStudentForm = () => {
                                             maxLength="100"
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            Please provide a valid email.
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3" controlId="formUsername">
-                                        <Form.Label>Username</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="username"
-                                            value={studentData.username}
-                                            readOnly
-                                            maxLength="50"
-                                            style={{ backgroundColor: '#e9ecef' }}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            Please provide a valid username.
+                                            Please provide a valid email address.
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
