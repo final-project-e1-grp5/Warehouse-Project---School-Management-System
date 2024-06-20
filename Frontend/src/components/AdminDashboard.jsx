@@ -55,7 +55,7 @@ const AdminDashboard = () => {
                     <Card className="text-center">
                         <Card.Body>
                             <Card.Title>Classes</Card.Title>
-                            <Link to="/class/add">
+                            <Link to="/admin/class/add">
                                 <Button variant="warning" size="lg" className="w-100 mb-2">Add Class</Button>
                             </Link>
                             <Link to="/class/edit/:id">

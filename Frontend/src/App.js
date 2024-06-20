@@ -82,7 +82,7 @@ function App() {
             userRole={user?.role}><AddTeacherForm/></Layout></ProtectedRoute>}/>
           <Route path="/teacher/edit/:id" element={<ProtectedRoute role={user?.role} requiredRoles={['ADMIN']}><Layout
             userRole={user?.role}><EditTeacherForm/></Layout></ProtectedRoute>}/>
-          <Route path="/class/add" element={<ProtectedRoute role={user?.role} requiredRoles={['ADMIN']}><Layout
+          <Route path="/admin/class/add" element={<ProtectedRoute role={user?.role} requiredRoles={['ADMIN']}><Layout
             userRole={user?.role}><AddClassForm/></Layout></ProtectedRoute>}/>
           <Route path="/class/edit/:id" element={<ProtectedRoute role={user?.role} requiredRoles={['ADMIN']}><Layout
             userRole={user?.role}><EditClassForm/></Layout></ProtectedRoute>}/>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, ListGroup, InputGroup } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, ListGroup, InputGroup} from 'react-bootstrap';
 import './AddClassForm.css';
 
 const AddClassForm = () => {
@@ -22,7 +22,7 @@ const AddClassForm = () => {
 
     const fetchTeachers = async () => {
         try {
-            const response = await axios.get('/teacher/all');
+            const response = await axios.get('admin/teacher/all');
             setTeachers(response.data || []);  // Ensure that teachers is an array
         } catch (error) {
             console.error('Error fetching teachers:', error);
@@ -31,7 +31,7 @@ const AddClassForm = () => {
 
     const fetchStudents = async () => {
         try {
-            const response = await axios.get('/student/all');
+            const response = await axios.get('admin/student/all');
             setStudents(response.data || []);  // Ensure that students is an array
             setFilteredStudents(response.data || []);
         } catch (error) {
@@ -68,7 +68,7 @@ const AddClassForm = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         if (name === 'className') {
             setClassName(value);
         } else if (name === 'teacherId') {
@@ -93,7 +93,7 @@ const AddClassForm = () => {
 
                 const response = await axios.post('/class/add', {
                     name: className,
-                    teacher: { id: teacherId },
+                    teacher: {id: teacherId},
                     studentIds: Array.from(selectedStudents)
                 }, {
                     headers: {
@@ -179,7 +179,7 @@ const AddClassForm = () => {
                                     onClick={() => handleSelectStudent(student.id)}
                                 >
                                     <div>
-                                        <strong>{student.firstName} {student.lastName}</strong> ({student.username})<br />
+                                        <strong>{student.firstName} {student.lastName}</strong> ({student.username})<br/>
                                         {student.email}
                                     </div>
                                 </ListGroup.Item>
@@ -197,7 +197,7 @@ const AddClassForm = () => {
                                         onClick={() => handleSelectStudent(student.id)}
                                     >
                                         <div>
-                                            <strong>{student.firstName} {student.lastName}</strong> ({student.username})<br />
+                                            <strong>{student.firstName} {student.lastName}</strong> ({student.username})<br/>
                                             {student.email}
                                         </div>
                                     </ListGroup.Item>
