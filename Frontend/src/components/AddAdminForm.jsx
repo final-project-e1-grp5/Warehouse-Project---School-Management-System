@@ -53,18 +53,16 @@ const AddAdminForm = () => {
                     throw new Error("No token found");
                 }
 
-                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1]; // Get CSRF token from cookie
-
                 const username = generateUsername();
                 console.log('Generated Username:', username);
 
-                const response = await axios.post('http://localhost:7777/admin', {
+                // Modify axios request headers to remove CSRF token for debugging
+                const response = await axios.post('/admin/admin', {
                     ...adminData,
                     username
                 }, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'X-XSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
