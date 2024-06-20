@@ -1,0 +1,24 @@
+.custom-carousel .carousel-control-prev,
+.custom-carousel .carousel-control-next {
+    width: 5%;
+}
+
+.custom-carousel .carousel-control-prev-icon,
+.custom-carousel .carousel-control-next-icon {
+    filter: invert(1);
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: adds a semi-transparent background */
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.custom-carousel .carousel-control-prev {
+    left: -3%; /* Move the control outside */
+}
+
+.custom-carousel .carousel-control-next {
+    right: -3%; /* Move the control outside */
+}
+
+.custom-carousel .carousel-item {
+    padding: 0 5%; /* Add some padding to prevent content from being too close to the controls */
+}
