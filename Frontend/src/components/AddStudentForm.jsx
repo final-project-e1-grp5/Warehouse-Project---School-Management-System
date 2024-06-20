@@ -1,4 +1,3 @@
-// Version 1.0
 import React, {useState} from 'react';
 import axios from 'axios';
 import {Form, Button, Container, Alert, Row, Col, InputGroup} from 'react-bootstrap';
@@ -13,10 +12,12 @@ const AddStudentForm = () => {
         lastName: '',
         email: '',
         password: '',
-        birthday: null,
-        phone: '',
+        dateOfBirth: null,
+        phoneNumber: '',
         address: '',
-        gender: ''
+        role: 'student',
+        enabled: true,
+        username: ''
     });
 
     const [validated, setValidated] = useState(false);
@@ -29,12 +30,12 @@ const AddStudentForm = () => {
     };
 
     const handleDateChange = (date) => {
-        setStudentData({...studentData, birthday: date});
+        setStudentData({...studentData, dateOfBirth: date});
     };
 
     const generateUsername = () => {
         const role = "ST"; // Hardcoded role for student
-        const dob = studentData.birthday ? studentData.birthday.toISOString().split('T')[0].replace(/-/g, '') : '';
+        const dob = studentData.dateOfBirth ? studentData.dateOfBirth.toISOString().split('T')[0].replace(/-/g, '') : '';
         const initials = (studentData.firstName[0] || '') + (studentData.lastName[0] || '');
         return `${role}${dob}${initials}`.toUpperCase();
     };
@@ -47,27 +48,28 @@ const AddStudentForm = () => {
             setValidated(true);
         } else {
             try {
-                const token = localStorage.getItem('token'); // Ensure the token is retrieved correctly
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error("No token found");
                 }
 
-                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1]; // Get CSRF token from cookie
-
                 const username = generateUsername();
                 console.log('Generated Username:', username);
 
-                const response = await axios.post('/student', {...studentData, username}, {
+                // Modify axios request headers to remove CSRF token for debugging
+                const response = await axios.post('/admin/student/add', {
+                    ...studentData,
+                    username
+                }, {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Add Authorization header
-                        'X-XSRF-TOKEN': csrfToken, // Add CSRF token header
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
                 console.log('Student added successfully:', response.data);
 
                 setShowSuccess(true);
-                setTimeout(() => setShowSuccess(false), 3000); // Hide success message after 3 seconds
+                setTimeout(() => setShowSuccess(false), 3000);
 
                 // Reset form
                 setStudentData({
@@ -75,14 +77,19 @@ const AddStudentForm = () => {
                     lastName: '',
                     email: '',
                     password: '',
-                    birthday: null,
-                    phone: '',
+                    dateOfBirth: null,
+                    phoneNumber: '',
                     address: '',
-                    gender: ''
+                    role: 'student',
+                    enabled: true,
+                    username: ''
                 });
                 setValidated(false);
             } catch (error) {
                 console.error('Error adding student:', error);
+                if (error.response) {
+                    console.error('Error response data:', error.response.data);
+                }
             }
         }
     };
@@ -134,45 +141,23 @@ const AddStudentForm = () => {
                         </Row>
                         <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formBirthday">
-                                    <Form.Label>Birthday</Form.Label>
+                                <Form.Group className="mb-3" controlId="formDateOfBirth">
+                                    <Form.Label>Date of Birth</Form.Label>
                                     <div className="custom-datepicker">
                                         <DatePicker
-                                            selected={studentData.birthday}
+                                            selected={studentData.dateOfBirth}
                                             onChange={handleDateChange}
                                             dateFormat="yyyy-MM-dd"
                                             className="form-control"
-                                            name="birthday"
+                                            name="dateOfBirth"
                                             required
                                         />
                                     </div>
                                     <div className="invalid-feedback">
-                                        Please provide a valid birthday.
+                                        Please provide a valid date of birth.
                                     </div>
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formGender">
-                                    <Form.Label>Gender</Form.Label>
-                                    <Form.Control
-                                        as="select"
-                                        name="gender"
-                                        value={studentData.gender}
-                                        onChange={handleChange}
-                                        required
-                                    >
-                                        <option value="">Select Gender</option>
-                                        <option value="MALE">Male</option>
-                                        <option value="FEMALE">Female</option>
-                                        <option value="DIVERSE">Diverse</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        Please select a gender.
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formAddress">
                                     <Form.Label>Address</Form.Label>
@@ -188,13 +173,15 @@ const AddStudentForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col md={6}>
-                                <Form.Group className="mb-3" controlId="formPhone">
-                                    <Form.Label>Phone</Form.Label>
+                                <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Label>Phone Number</Form.Label>
                                     <Form.Control
                                         type="tel"
-                                        name="phone"
-                                        value={studentData.phone}
+                                        name="phoneNumber"
+                                        value={studentData.phoneNumber}
                                         onChange={handleChange}
                                         required
                                         pattern="^\d*$"
@@ -204,8 +191,6 @@ const AddStudentForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
-                        </Row>
-                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
@@ -221,6 +206,8 @@ const AddStudentForm = () => {
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formPassword">
                                     <Form.Label>Password</Form.Label>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Form, Button, Container, Alert, Row, Col, InputGroup, ListGroup } from 'react-bootstrap';
+import {Form, Button, Container, Alert, Row, Col, InputGroup, ListGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -31,7 +31,7 @@ const EditAdminForm = () => {
 
     const fetchAdminData = async (id) => {
         try {
-            const response = await axios.get(`/admin/${id}`);
+            const response = await axios.get(`/admin/admin/${id}`);
             const admin = response.data;
             setAdminData({
                 firstName: admin.firstName,
@@ -56,7 +56,7 @@ const EditAdminForm = () => {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get(`/admin?search=${searchQuery}`);
+            const response = await axios.get(`/admin/admin?search=${searchQuery}`);
             setSearchResults(response.data);
         } catch (error) {
             console.error('Error searching for admin:', error);
@@ -65,7 +65,7 @@ const EditAdminForm = () => {
 
     const handleViewAll = async () => {
         try {
-            const response = await axios.get(`/admin`);
+            const response = await axios.get(`/admin/admin/all`);
             setSearchResults(response.data);
         } catch (error) {
             console.error('Error fetching all admins:', error);
@@ -90,8 +90,8 @@ const EditAdminForm = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        const updatedAdminData = { ...adminData, [name]: value };
+        const {name, value} = e.target;
+        const updatedAdminData = {...adminData, [name]: value};
 
         if (name === 'firstName' || name === 'lastName' || name === 'birthday') {
             updatedAdminData.username = generateUsername(updatedAdminData);
@@ -101,12 +101,12 @@ const EditAdminForm = () => {
     };
 
     const handleDateChange = (date) => {
-        const updatedAdminData = { ...adminData, birthday: date };
+        const updatedAdminData = {...adminData, birthday: date};
         updatedAdminData.username = generateUsername(updatedAdminData);
         setAdminData(updatedAdminData);
     };
 
-    const generateUsername = ({ firstName, lastName, birthday, role }) => {
+    const generateUsername = ({firstName, lastName, birthday, role}) => {
         if (!firstName || !lastName || !birthday) {
             return '';
         }
@@ -132,7 +132,7 @@ const EditAdminForm = () => {
                 const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN')).split('=')[1]; // Get CSRF token from cookie
 
                 // Create a copy of adminData without the placeholder password
-                const updatedAdminData = { ...adminData };
+                const updatedAdminData = {...adminData};
                 if (updatedAdminData.password === '********') {
                     delete updatedAdminData.password;
                 }
@@ -368,7 +368,7 @@ const EditAdminForm = () => {
                                             value={adminData.username}
                                             readOnly
                                             maxLength="50"
-                                            style={{ backgroundColor: '#e9ecef' }} // Grey out the username field
+                                            style={{backgroundColor: '#e9ecef'}} // Grey out the username field
                                         />
                                         <Form.Control.Feedback type="invalid">
                                             Please provide a valid username.

@@ -16,7 +16,7 @@ const AddAdminForm = () => {
         phoneNumber: '',
         address: '',
         role: 'admin',
-        enabled: false,
+        enabled: true,
         username: ''
     });
 
@@ -81,7 +81,7 @@ const AddAdminForm = () => {
                     phoneNumber: '',
                     address: '',
                     role: 'admin',
-                    enabled: false,
+                    enabled: true,
                     username: ''
                 });
                 setValidated(false);
